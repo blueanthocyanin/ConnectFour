@@ -1,4 +1,5 @@
 import enum
+from stringcolor import cs
 
 class GridPosition(enum.Enum):
     EMPTY = '.'
@@ -93,8 +94,8 @@ class Game:
         self._connectN = connectN
         self._targetScore = targetScore
 
-        name_1 = input("Enter name for Player 1 (Yellow): ")
-        name_2 = input("Enter name for Player 2 (Red): ")
+        name_1 = input(f"Enter name for Player 1 {cs(('Yellow'), 'yellow')}: ")
+        name_2 = input(f"Enter name for Player 2 {cs(('Red'), 'red')}: ")
 
         self._players = [
             Player(name_1, GridPosition.YELLOW),
@@ -106,7 +107,7 @@ class Game:
             self._score[player.getName()] = 0
 
     def printBoard(self):
-        print('Board:\n')
+        print(cs('\nBoard:\n', 'blue'))
         grid = self._grid.getGrid()
         for i in range(len(grid)):
             row = ''
@@ -114,9 +115,9 @@ class Game:
                 if piece == GridPosition.EMPTY:
                     row += '. '
                 elif piece == GridPosition.YELLOW:
-                    row += 'Y '
+                    row += cs('Y ', 'yellow')
                 elif piece == GridPosition.RED:
-                    row += 'R '
+                    row += cs('R ', 'red')
             print(row)
         print('')
 
@@ -124,7 +125,7 @@ class Game:
         self.printBoard()
         print(f'{player.getName()}\'s turn.')
         colCnt = self._grid.getColumnCount()
-        moveColumn = int(input(f'Enter a column between {0} and {colCnt - 1} to add piece: '))
+        moveColumn = int(input(f'Enter a column between 1 and {colCnt} to add piece: ')) - 1
         moveRow = self._grid.placePiece(moveColumn, player.getPieceColour())
         return (moveRow, moveColumn)
     
@@ -134,6 +135,7 @@ class Game:
                 row, col = self.playMove(player)
                 pieceColour = player.getPieceColour()
                 if self._grid.checkWin(self._connectN, row, col, pieceColour):
+                    self.printBoard()
                     self._score[player.getName()] += 1
                     return player
                 
