@@ -1,8 +1,8 @@
 import enum
 
 class GridPosition(enum.Enum):
-    EMPTY = 0,
-    YELLOW = 1,
+    EMPTY = '.'
+    YELLOW = 1
     RED = 2 
 
 
@@ -10,7 +10,7 @@ class Grid:
     def __init__(self, rows, columns):
         self._rows = rows
         self._columns = columns
-        self.grid = None
+        self._grid = None
         self.initGrid()
 
     def initGrid(self):
@@ -46,8 +46,8 @@ class Grid:
             
         # Check vertical
         count = 0
-        for r in range(self._columns):
-            if self._grid[col][r] == piece:
+        for r in range(self._rows):
+            if self._grid[r][col] == piece:
                 count += 1
             else:
                 count = 0
@@ -65,7 +65,7 @@ class Grid:
                 return True
             
         # Check anti-diagonal
-        for a in range(self._rows):
+        for r in range(self._rows):
             c = col - row + r
             if c >= 0 and c < self._columns and self._grid[r][c] == piece:
                 count += 1
@@ -93,9 +93,12 @@ class Game:
         self._connectN = connectN
         self._targetScore = targetScore
 
+        name_1 = input("Enter name for Player 1 (Yellow): ")
+        name_2 = input("Enter name for Player 2 (Red): ")
+
         self._players = [
-            Player('Player 1', GridPosition.YELLOW),
-            Player('Player 2', GridPosition.RED)
+            Player(name_1, GridPosition.YELLOW),
+            Player(name_2, GridPosition.RED)
         ]
 
         self._score = {}
@@ -109,7 +112,7 @@ class Game:
             row = ''
             for piece in grid[i]:
                 if piece == GridPosition.EMPTY:
-                    row += '0 '
+                    row += '. '
                 elif piece == GridPosition.YELLOW:
                     row += 'Y '
                 elif piece == GridPosition.RED:
@@ -133,3 +136,18 @@ class Game:
                 if self._grid.checkWin(self._connectN, row, col, pieceColour):
                     self._score[player.getName()] += 1
                     return player
+                
+    def play(self):
+        maxScore = 0
+        winner = None
+        while maxScore < self._targetScore:
+            winner = self.playRound()
+            print(f'{winner.getName()} won the round.')
+            maxScore = max(self._score[winner.getName()], maxScore)
+
+            self._grid.initGrid() # reset grid
+        print(f'{winner.getName()} won the game.')
+
+grid = Grid(6, 7)
+game = Game(grid, 4, 2)
+game.play()
